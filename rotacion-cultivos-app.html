@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rotación de cultivos en México</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+:root{--bg:#f6f3e8;--sf:#fff;--tx:#1f2a1c;--mu:#566150;--pr:#2f6b2f;--pt:#fff;--ac:#b4690e;--bd:#cfc9b4;--rk:#a3321f;--rb:#fbe9e5;--ok:#e3f0dc;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141b12;--sf:#1e281b;--tx:#eef2e8;--mu:#aab5a2;--pr:#7fc47f;--pt:#10200f;--ac:#e8a24a;--bd:#3a4836;--rk:#ff9a86;--rb:#3a1f1a;--ok:#223a1f}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:19px/1.55 "Atkinson Hyperlegible",Verdana,sans-serif}
+main{max-width:860px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:1.9rem;line-height:1.2;margin:.2em 0}h2{font-size:1.35rem;margin:1.4em 0 .5em}h3{font-size:1.1rem;margin:0 0 .3em}
+.sub{color:var(--mu);margin:0 0 1em}
+.card{background:var(--sf);border:2px solid var(--bd);border-radius:14px;padding:16px;margin:12px 0}
+label{display:block;font-weight:700;margin:12px 0 4px}
+input,select{width:100%;font:inherit;padding:12px;border:2px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);min-height:48px}
+.row{display:grid;grid-template-columns:1fr;gap:0 14px}@media(min-width:600px){.row{grid-template-columns:1fr 1fr}}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chips button{font:inherit;font-weight:700;min-height:52px;padding:10px 18px;border-radius:26px;border:2px solid var(--pr);background:var(--sf);color:var(--tx);cursor:pointer}
+.chips button[aria-pressed=true]{background:var(--pr);color:var(--pt)}
+:focus-visible{outline:4px solid var(--ac);outline-offset:2px}
+dl{display:grid;grid-template-columns:1fr;gap:10px 16px;margin:0}@media(min-width:600px){dl{grid-template-columns:200px 1fr}}
+dt{font-weight:700;color:var(--pr)}dd{margin:0}
+.risk{background:var(--rb);border-left:8px solid var(--rk);border-radius:10px;padding:12px 14px;margin:10px 0}
+.risk b{color:var(--rk)}.good{background:var(--ok);border-radius:10px;padding:12px 14px;margin:10px 0}
+.note{color:var(--mu);font-size:.9rem}
+details{background:var(--sf);border:2px solid var(--bd);border-radius:14px;padding:12px 16px;margin:10px 0}
+summary{font-weight:700;cursor:pointer;min-height:44px;display:flex;align-items:center}
+ul,ol{padding-left:1.3em;margin:.4em 0}li{margin:.3em 0}
+.btn{font:inherit;font-weight:700;min-height:52px;padding:10px 22px;border-radius:12px;border:0;background:var(--ac);color:#fff;cursor:pointer;margin-top:14px}
+#res[hidden]{display:none}
+textarea{width:100%;font:inherit;padding:12px;border:2px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx)}
+.mapsvg{width:100%;height:auto;background:var(--ok);border:2px solid var(--bd);border-radius:12px;cursor:crosshair;touch-action:manipulation}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid var(--bd);padding:8px;text-align:left}
+.warn{background:#fff3cd;color:#4a3b00;border-left:8px solid #b58900;border-radius:10px;padding:12px 14px;margin:10px 0}
+.btn2{background:var(--pr);color:var(--pt)}
+.pg{display:none}.pg.on{display:block}
+#map{height:440px;border-radius:12px;border:2px solid var(--bd);margin-top:12px}
+#wel{position:fixed;inset:0;z-index:1000;background:var(--bg);overflow:auto;padding:24px 16px;display:flex;justify-content:center}#wel[hidden]{display:none}
+.wb{max-width:640px;width:100%}.wb h1{font-size:2.2rem}
+.lg,.mn{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 22px}
+.lg button,.mn button,#nv button{font:inherit;font-weight:700;min-height:56px;padding:10px 18px;border-radius:14px;border:2px solid var(--pr);background:var(--sf);color:var(--tx);cursor:pointer}
+.mn button{flex:1 1 260px;text-align:left;font-size:1.1rem}
+.lg button[aria-pressed=true],#nv button[aria-current=true]{background:var(--pr);color:var(--pt)}
+#nv{position:sticky;top:0;z-index:20;background:var(--bg);display:flex;flex-wrap:wrap;gap:8px;padding:8px 16px;border-bottom:2px solid var(--bd)}#nv[hidden]{display:none}
+#nv button{min-height:48px;padding:6px 12px;font-size:.95rem}
+:root{--bg:#F5F4F0;--sf:#fff;--tx:#14221B;--mu:#475550;--pr:#1B5E3F;--pt:#fff;--ac:#A85518;--bd:#DFDDD4;--rk:#B42318;--rb:#FEF3F2;--ok:#E8F3EE;--nb:#0B3D91}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif}h2{color:var(--pr)}
+.card{border-radius:16px;border:1px solid var(--bd);border-top:5px solid var(--pr);box-shadow:0 1px 2px rgba(20,34,27,.06)}
+#bb{background:var(--nb)}#map{height:520px}
+#wel{background:linear-gradient(135deg,#133A2A 0%,#1B4E39 58%,#0B3D91 100%);--tx:#fff;--mu:#DCEBE3;--sf:rgba(255,255,255,.12);--bd:rgba(255,255,255,.35);--pr:#E2A03F;--pt:#132A1E;color:#fff}
+#wel h2{color:#fff}
+.br{display:none}
+@media(min-width:900px){
+#nv{position:fixed;top:0;left:0;bottom:0;width:260px;flex-direction:column;flex-wrap:nowrap;padding:18px 12px;background:#133A2A;border:0;overflow:auto}
+#nv button{background:transparent;border-color:transparent;color:#DCE7E1;text-align:left;width:100%}
+#nv button:hover{background:#1B4D38}
+#nv button[aria-current=true]{background:#236348;color:#fff;border-color:rgba(255,255,255,.2)}
+#nv .br{display:block;color:#fff;font-family:Georgia,serif;font-size:1.25rem;font-weight:700;padding:4px 10px 14px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:8px}
+#nv .br small{display:block;font:.75rem "Atkinson Hyperlegible",sans-serif;color:#A7C4B5}
+main{margin:0 auto 0 260px;max-width:1080px;padding:28px}}
+
+</style></head><body>
+<div id="wel"><div class="wb"><div style="font-size:3rem" aria-hidden="true">🌽</div>
+<h1>Rotación de cultivos en México</h1><p class="sub">Bienvenido. Primero elige tu idioma y luego lo que quieres hacer.</p>
+<h2>Idioma</h2><div class="lg" role="group" aria-label="Idioma"><button data-l="es" aria-pressed="true">Español</button><button data-l="en" aria-pressed="false">English</button><button data-l="pu" aria-pressed="false">P’urhépecha</button></div>
+<p id="pun" class="note" hidden>Traducción al purépecha en construcción: lo que no está traducido se ve en español.</p>
+<h2>¿Qué quieres hacer?</h2><div class="mn">
+<button data-p="p1"><span aria-hidden="true">🏡</span> <span>Mi terreno</span></button>
+<button data-p="p2"><span aria-hidden="true">🌱</span> <span>Elegir cultivo</span></button>
+<button data-p="p3"><span aria-hidden="true">🗺️</span> <span>Mapa</span></button>
+<button data-p="p4"><span aria-hidden="true">🌦️</span> <span>Clima y rotaciones</span></button>
+<button data-p="p5"><span aria-hidden="true">⚠️</span> <span>Riesgos y consejos</span></button></div></div></div>
+<nav id="nv" hidden aria-label="Menú"><div class="br">🌽 AgroRotación<small>Imágenes y datos NASA</small></div><button data-p="home">Inicio</button><button data-p="p1">Mi terreno</button><button data-p="p2">Elegir cultivo</button><button data-p="p3">Mapa</button><button data-p="p4">Clima y rotaciones</button><button data-p="p5">Riesgos y consejos</button></nav>
+<main>
+<h1>Rotación de cultivos en México</h1>
+<p class="sub">Elige tu terreno y tu cultivo. Verás cuándo preparar, sembrar y cosechar, y qué riesgos vigilar.</p>
+
+<div class="pg" id="p1"><section class="card" aria-labelledby="t1">
+<h2 id="t1" style="margin-top:0">1. Tu terreno</h2>
+<div class="row">
+<div><label for="nom">Nombre del terreno</label><input id="nom" placeholder="Ej. Parcela El Mirador"></div>
+<div><label for="loc">Pueblo o ciudad</label><input id="loc" placeholder="Ej. Nahuatzen"></div>
+<div><label for="est">Estado</label><select id="est"></select></div>
+<div><label for="tam">Tamaño del terreno</label><input id="tam" type="number" min="0" step="any" inputmode="decimal" placeholder="Ej. 2.5"></div>
+<div><label for="uni">Unidad</label><select id="uni"><option>hectáreas</option><option>metros cuadrados</option></select></div>
+<div><label for="sue">Tipo de suelo</label><select id="sue"><option>No sé</option><option>Arcilloso</option><option>Arenoso</option><option>Franco / medio</option></select></div>
+</div>
+<button class="btn" id="gu">Guardar terreno</button> <span id="gm" class="note" role="status"></span>
+</section>
+
+</div><div class="pg" id="p2"><section aria-labelledby="t2"><h2 id="t2">2. ¿Qué cultivo vas a sembrar?</h2>
+<div class="chips" id="chips" role="group" aria-label="Cultivos"></div>
+<div class="card"><label for="fs">Fecha en que piensas sembrar</label><input id="fs" type="date"></div></section>
+
+<section id="res" hidden aria-live="polite"></section>
+
+</div><div class="pg" id="p3"><section class="card" aria-labelledby="t3"><h2 id="t3" style="margin-top:0">3. Ubicación en el mapa</h2>
+<label for="bq">Buscar dirección o lugar</label><div style="display:flex;gap:8px"><input id="bq" placeholder="Ej. Nahuatzen, Michoacán"><button class="btn btn2" id="bb" style="margin:0">Buscar</button></div>
+<button class="btn btn2" id="rt">Usar mi ubicación en tiempo real</button> <button class="btn btn2" id="gc">Ir a las coordenadas</button>
+<p class="note">También puedes tocar el mapa para marcar un punto.</p>
+<div class="row"><div><label for="pn">Nombre del punto</label><input id="pn" value="Nahuatzen"></div><div><label for="la">Latitud</label><input id="la" type="number" step="any" value="19.64"></div><div><label for="lo">Longitud</label><input id="lo" type="number" step="any" value="-101.92"></div></div>
+<button class="btn btn2" id="ap">Agregar punto</button> <a id="gl" class="note" target="_blank" rel="noopener" href="#">Abrir en Google Maps</a>
+<div class="row"><div><label for="nl">Capa satelital de la NASA</label><select id="nl"><option value="">Ninguna</option><option value="t">Color real (MODIS)</option><option value="n">Vegetación sana (NDVI)</option><option value="l">Temperatura de la superficie (día)</option><option value="p">Lluvia reciente (IMERG)</option></select></div>
+<div><label for="nd">Fecha de la imagen</label><input id="nd" type="date"></div></div>
+<label for="no">Transparencia de la capa</label><input id="no" type="range" min="20" max="100" value="80" style="min-height:32px;padding:0">
+<p id="nn" class="note" role="status"></p>
+<div id="map" role="application" aria-label="Mapa"></div><p id="bm" class="note" role="status"></p>
+<ul id="pl"></ul></section>
+
+</div><div class="pg" id="p4"><section class="card" aria-labelledby="t4"><h2 id="t4" style="margin-top:0">4. Clima de tu punto y comparación de rotaciones</h2>
+<p>Pega el clima mensual de tu punto (NASA POWER): 12 líneas, de enero a diciembre, con <b>Tmín, Tmáx (°C) y lluvia (mm)</b>.</p>
+<p class="note">Esta página no puede descargar datos de la NASA por sí sola. Consíguelos con la latitud y longitud de arriba en <a href="https://power.larc.nasa.gov/data-access-viewer/" target="_blank" rel="noopener">NASA POWER Data Access Viewer</a> y pégalos aquí.</p>
+<label for="cl">Clima mensual</label><textarea id="cl" rows="12" placeholder="5.2, 22.1, 12"></textarea>
+<div class="row"><div><label for="pr">¿Qué te importa más?</label><select id="pr"><option value="agua">Ahorrar agua</option><option value="suelo">Mejorar el suelo</option><option value="forraje">Forraje para animales</option><option value="ingreso">Ingreso extra</option></select></div><div><label for="ra">Tu rotación actual</label><select id="ra"></select></div></div>
+<button class="btn" id="ca">Comparar rotaciones</button> <button class="btn btn2" id="ej">Probar con datos de ejemplo</button>
+<div id="cr" aria-live="polite"></div></section>
+
+<details><summary>Qué significan estos términos</summary><ul>
+<li><b>Helada:</b> temperatura mínima de 0 °C o menos; daña hojas, flores y plántulas.</li>
+<li><b>Satélite vs. terreno:</b> el satélite promedia áreas grandes (cientos de metros a kilómetros) y no ve tu parcela exacta. Un pluviómetro o termómetro en tu terreno mide ese punto. Combinar ambos da mejores decisiones.</li>
+<li><b>Evapotranspiración, humedad del suelo (SMAP), NDVI, estrés térmico (ECOSTRESS), lluvia (GPM):</b> son datos de la NASA que aún no están conectados a esta versión.</li></ul></details>
+
+</div><div class="pg" id="p5"><h2>Para todos los cultivos</h2>
+<details><summary>Cuándo es peligroso sembrar</summary><ul>
+<li><b>Suelo encharcado:</b> las raíces se quedan sin oxígeno y aparecen enfermedades.</li>
+<li><b>Suelo muy seco:</b> la semilla no nace pareja. Siembra solo con humedad o riego.</li>
+<li><b>Helada cerca de la germinación o floración:</b> son las etapas más sensibles. Ajusta la fecha (conocimiento general).</li>
+<li><b>Siembra tardía:</b> en Valles Altos el trigo de temporal se siembra en mayo y junio.</li>
+<li><b>Semilla sin certificar:</b> puede traer enfermedades, sobre todo en papa.</li>
+<li><b>Siembra muy densa:</b> poca ventilación y más hongos.</li></ul></details>
+<details><summary>Cuándo es peligroso cosechar</summary><ul>
+<li><b>Antes de la madurez:</b> el grano queda lechoso y baja el rendimiento.</li>
+<li><b>Demasiado tarde:</b> las vainas se secan y el grano se cae en el campo.</li>
+<li><b>Con lluvia:</b> moja el grano, lo mancha y favorece hongos.</li>
+<li><b>Grano húmedo al guardarlo:</b> principal causa de moho. Se desgrana con 18–20 % de humedad, pero para guardar hay que secarlo más.</li>
+<li><b>Micotoxinas (Aspergillus, Fusarium):</b> con humedad y calor pueden hacer que rechacen el grano y dañar la salud.</li>
+<li><b>Almacén:</b> gorgojos, roedores y hongos causan pérdidas de hasta 27 % en maíz y 23 % en frijol en América Latina.</li></ul></details>
+<details><summary>Riesgos del clima</summary><ul>
+<li>Sequía, exceso de lluvia, heladas, calor elevado, vientos fuertes y granizo.</li>
+<li>Humedad relativa ideal: 50 a 70 %. Muy alta favorece hongos; baja aumenta la pérdida de agua.</li>
+<li>Temporada de lluvias: cultivos que aprovechen la humedad y tengan buen drenaje. Seca: sorgo. Fresca: avena, trigo y algunas hortalizas. Cálida: maíz y sorgo.</li></ul></details>
+<details open><summary>Lista para que no mueran las plantas</summary><ol>
+<li>Revisa el pronóstico de 7 días antes de sembrar, aplicar o cosechar.</li>
+<li>Siembra con humedad y buen drenaje; evita encharcamientos.</li>
+<li>Rota cultivos; no repitas plantas de la misma familia seguidas.</li>
+<li>Usa semilla certificada y variedades resistentes.</li>
+<li>Deja espacio para que circule el aire.</li>
+<li>Revisa el cultivo cada semana desde que nace.</li>
+<li>Retira plantas enfermas y maneja los residuos.</li>
+<li>Cosecha en madurez, con tiempo seco, y seca el grano antes de guardarlo.</li>
+<li>Almacena en lugar seco, ventilado y protegido de roedores e insectos.</li>
+<li>Consulta las alertas de SENASICA y el comité estatal de sanidad vegetal.</li></ol></details>
+<details><summary>Rotación y regiones</summary>
+<p><b>Valles Altos</b> (Estado de México, Hidalgo, Puebla, Tlaxcala, Morelos, Guerrero): maíz → frijol → avena → papa, casi siempre de temporal. Maíz también con haba, chícharo, trigo y cebada.</p>
+<p><b>Norte cálido</b> (Sinaloa, Sonora): maíz, sorgo, frijol y hortalizas, normalmente con riego.</p>
+<p class="note">Es un ejemplo de planificación, no una regla. Adáptalo al clima y al terreno.</p></details>
+<p class="note">Fuentes del documento base: SADER, INIFAP, SIAP, SENASICA, CIMMYT, FAO y estudios mexicanos. Los tiempos y temperaturas son orientativos y cambian con variedad, clima, agua y altitud. Los datos marcados «conocimiento general» deben verificarse con la oficina local de sanidad vegetal.</p>
+</div></main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+var G="Cosecha en madurez, con tiempo seco, y seca el grano antes de guardarlo. El documento base no da señales de madurez específicas para este cultivo: consulta a tu técnico agrícola.";
+var C={
+"Maíz":{s:"Profundo, fértil, buena humedad y drenaje.",m:[4,6],p:[2,4],pt:"Barbecho, rastreo y surcado.",l:"6 a 8 horas o más (alta)",t:"24–30 °C",pl:"Gusano cogollero, gusano elotero, gallina ciega y chapulín. El cogollero puede causar pérdidas de 30 a 40 % por defoliación.",pv:"Monitorear desde la emergencia, rotar con leguminosas, usar control biológico (parasitoides, baculovirus) y consultar alertas de SENASICA.",h:"Está maduro cuando el grano ya no está lechoso al pellizcarlo y tiene un punto negro. Desgrana con 18–20 % de humedad y seca más antes de almacenar.",f:"Heladas tardías después de la emergencia pueden dañar hojas y matar plántulas (conocimiento general).",r:"Jalisco, Sinaloa, Michoacán, Guanajuato y Estado de México (2024).",x:"Frijol (1 a 3 semanas) o avena (1 a 3 semanas)"},
+"Frijol":{s:"Ligero o medio, buen drenaje y materia orgánica.",m:[3,4],p:[1,3],pt:"Rastreo y formación de surcos.",l:"6 a 8 horas (alta)",t:"15–27 °C",pl:"Conchuela del frijol y mosquita blanca. Los favorece el clima cálido y los cultivos vecinos infestados.",pv:"Monitoreo semanal, eliminar residuos infestados y rotar con cereales.",h:"Las vainas cambian de color al madurar. Si te tardas, se secan en exceso y el grano se cae en el campo.",f:"Heladas tardías después de la emergencia pueden matar plántulas (conocimiento general).",r:"Zacatecas, Sinaloa, Durango, Chihuahua, Nayarit, Chiapas, Guanajuato, Puebla, San Luis Potosí y Veracruz. Se cultiva en los 32 estados.",x:"Maíz (2 a 4 semanas), avena o trigo"},
+"Avena":{s:"Con humedad, buena aireación y fertilidad media.",m:[3,4],p:[1,3],pt:"Limpieza y rastreo.",l:"6 a 8 horas (alta)",t:"15–20 °C",pl:"Roya del tallo. Ha aumentado en parcelas de temporal de Valles Altos y, sin control, puede reducir mucho el rendimiento.",pv:"Genotipos con tolerancia, fecha de siembra adecuada y fungicida cuando corresponda. Sembrar tarde puede aumentar el daño.",h:"En Chihuahua la mayor cosecha mensual es de octubre a diciembre. "+G.split(". ")[0]+".",f:"Tolera el frío en etapas vegetativas, pero no durante la floración (conocimiento general).",r:"Chihuahua (33 %), Zacatecas (21 %), Durango (17 %) y Estado de México (9 %) (dato de 2013).",x:"Frijol u otra leguminosa (1 a 2 semanas)"},
+"Trigo":{s:"Profundo, fértil y con drenaje adecuado.",m:[4,6],p:[2,4],pt:"Barbecho y rastreo.",l:"6 a 8 horas (alta)",t:"15–25 °C",pl:"Roya amarilla, roya de la hoja y pulgón verde de los cereales. Los favorecen la humedad alta y las temperaturas frescas.",pv:"Variedades resistentes, siembra en fecha recomendada y monitoreo de hojas.",h:G,f:"La floración y el inicio del llenado de grano son las etapas más sensibles: 0 °C en floración causa esterilidad del polen y -2 °C en grano acuoso afecta rendimiento y calidad. En Valles Altos el trigo de temporal se siembra en mayo y junio.",r:"Sonora, Guanajuato, Baja California, Chihuahua y Michoacán (dato de 2009, 85.5 % de la producción). Temporal en Valles Altos: 15 a 23 °C y 750 a 900 mm de lluvia.",x:"Maíz (2 a 4 semanas)"},
+"Sorgo":{s:"Se adapta a suelos arenosos, arcillosos y de fertilidad media.",m:[3,5],p:[2,4],pt:"Barbecho, rastreo y surcado.",l:"6 a 8 horas o más (alta)",t:"22–30 °C",pl:"Gusano cogollero y otros insectos del follaje. Los favorecen el calor y las siembras escalonadas.",pv:"Monitoreo y siembras en fechas agrupadas (conocimiento general).",h:G,f:"Tolera la falta de agua, por eso va bien en temporada seca.",r:"Por conocimiento general: Tamaulipas, Guanajuato, Sinaloa, Michoacán y Jalisco. Pendiente verificar en SIAP. Cerca del 62 % de las tierras agrícolas es apta en temporal.",x:"Frijol (1 a 3 semanas)"},
+"Haba":{s:"Profundo, fresco, con materia orgánica y buen drenaje.",m:[4,5],p:[1,3],pt:"Limpieza y preparación de surcos.",l:"5 a 8 horas (media-alta)",t:"15–20 °C",pl:"Mancha de chocolate (hongo Botrytis) y roya. Los favorecen la humedad alta y la poca ventilación (conocimiento general).",pv:"Rotar, evitar siembra densa y retirar residuos.",h:G,f:"Tolera el frío en etapas vegetativas, pero no durante la floración (conocimiento general).",r:"Estado de México (también produce zanahoria, papa, avena y maíz).",x:"Trigo (1 a 3 semanas)"},
+"Zanahoria":{s:"Suelto, profundo, sin piedras y bien drenado.",m:[3,4],p:[2,3],pt:"Suavizar y nivelar el suelo. La semilla es pequeña y necesita superficie fina.",l:"6 a 8 horas (alta)",t:"15–20 °C",pl:"Pudrición de raíz y hongos del suelo. Los favorece el suelo encharcado o compactado (conocimiento general).",pv:"Camas elevadas, buen drenaje y rotación de al menos dos a tres ciclos.",h:G,f:"Evita el calor excesivo y el suelo encharcado.",r:"Estado de México.",x:"Lechuga (1 a 2 semanas)"},
+"Lechuga":{s:"Fértil, húmedo y con abundante materia orgánica.",m:[2,3],p:[1,2],pt:"Incorporar composta y preparar camas.",l:"4 a 6 horas (moderada)",t:"15–20 °C",pl:"Mildiu y pudrición del cuello. Los favorecen la humedad en hojas y el calor con exceso de riego (conocimiento general).",pv:"Riego por goteo o en la mañana y variedades adaptadas a la época.",h:G,f:"Protégela del calor excesivo.",r:"Guanajuato (25.6 % del volumen nacional, reporte 2026). Exporta a Estados Unidos y Canadá.",x:"Calabaza (1 a 2 semanas)"},
+"Papa":{s:"Suelto, profundo, fértil y sin exceso de humedad.",m:[3,5],p:[2,3],pt:"Aflojar el suelo y formar surcos o camas.",l:"6 a 8 horas (alta)",t:"15–20 °C",pl:"Tizón tardío (Phytophthora infestans). Lo favorecen el frío con humedad alta, el follaje mojado y la poca ventilación. Puede destruir un cultivo en una semana.",pv:"Variedades resistentes, semilla certificada, buena separación entre plantas, retirar plantas enfermas y fungicida preventivo en época de lluvias.",h:G,f:"Heladas tardías después de la emergencia pueden dañar la planta (conocimiento general).",r:"Sonora, Sinaloa y Veracruz por superficie; sur de Nuevo León; sierras de Puebla, Veracruz, Chihuahua, Michoacán y México. Las fuentes difieren según el criterio.",x:"Un cereal o una leguminosa; maíz (2 a 3 semanas). No repitas cultivos de la misma familia"},
+"Calabaza":{s:"Fértil, con buena humedad y drenaje.",m:[3,5],p:[1,3],pt:"Limpieza, abonado y surcado.",l:"6 a 8 horas (alta)",t:"20–30 °C",pl:"Mosquita blanca (transmite virus) y cenicilla. Las favorecen el calor, los ambientes secos y los cultivos vecinos infestados (conocimiento general).",pv:"Monitoreo, mallas o barreras y eliminación de plantas enfermas.",h:G,f:"Heladas tardías después de la emergencia pueden matar plántulas (conocimiento general).",r:"Sinaloa y Sonora lideran las hortalizas en general. Pendiente: datos específicos de calabaza por estado.",x:"Frijol (1 a 3 semanas)"}};
+var E="Aguascalientes,Baja California,Baja California Sur,Campeche,Chiapas,Chihuahua,Ciudad de México,Coahuila,Colima,Durango,Estado de México,Guanajuato,Guerrero,Hidalgo,Jalisco,Michoacán,Morelos,Nayarit,Nuevo León,Oaxaca,Puebla,Querétaro,Quintana Roo,San Luis Potosí,Sinaloa,Sonora,Tabasco,Tamaulipas,Tlaxcala,Veracruz,Yucatán,Zacatecas".split(",");
+var $=function(i){return document.getElementById(i)},cur=null;
+$("est").innerHTML=E.map(function(e){return"<option"+(e=="Michoacán"?" selected":"")+">"+e+"</option>"}).join("");
+$("chips").innerHTML=Object.keys(C).map(function(k){return'<button type="button" aria-pressed="false">'+k+"</button>"}).join("");
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function fd(d){return d.toLocaleDateString("es-MX",{day:"numeric",month:"long",year:"numeric"})}
+function add(d,days){var x=new Date(d);x.setDate(x.getDate()+Math.round(days));return x}
+function show(){
+ if(!cur)return;var c=C[cur],r=$("res"),h="";
+ var lug=[$("nom").value,$("loc").value&&($("loc").value+", "+$("est").value)].filter(Boolean).join(" · ");
+ var tam=$("tam").value?$("tam").value+" "+$("uni").value:"";
+ h+='<div class="card"><h2 style="margin-top:0">'+esc(cur)+"</h2>";
+ if(lug||tam)h+='<p class="sub">'+esc([lug,tam].filter(Boolean).join(" · "))+"</p>";
+ if($("fs").value){var s=new Date($("fs").value+"T12:00:00");
+  h+='<div class="good"><b>Calendario estimado</b><br>Empieza a preparar el terreno desde el '+fd(add(s,-c.p[1]*7))+".<br>Siembra: "+fd(s)+".<br>Cosecha estimada entre el "+fd(add(s,c.m[0]*30.4))+" y el "+fd(add(s,c.m[1]*30.4))+'.<br><span class="note">Aproximado: cambia con la variedad, el clima y el agua.</span></div>'}
+ else h+='<p class="note">Escribe tu fecha de siembra para ver las fechas de preparación y cosecha.</p>';
+ h+="<dl><dt>Suelo que necesita</dt><dd>"+c.s+"</dd><dt>Tiempo de cultivo</dt><dd>"+c.m[0]+" a "+c.m[1]+" meses</dd><dt>Preparación</dt><dd>"+c.p[0]+" a "+c.p[1]+" semanas antes de sembrar. "+c.pt+"</dd><dt>Luz solar</dt><dd>"+c.l+"</dd><dt>Temperatura ideal</dt><dd>"+c.t+"</dd><dt>Cuándo cosechar</dt><dd>"+c.h+"</dd><dt>Después de este cultivo</dt><dd>"+c.x+"</dd><dt>Dónde se produce</dt><dd>"+c.r+"</dd></dl></div>";
+ h+='<div class="risk"><b>Plagas y enfermedades:</b> '+c.pl+"<br><b>Cómo evitarlas:</b> "+c.pv+'</div><div class="risk"><b>Frío y helada:</b> '+c.f+"</div>";
+ if($("sue").value=="Arcilloso")h+='<p class="note">Tu suelo es arcilloso: necesita más tiempo de preparación que uno arenoso. No lo trabajes ni muy mojado ni muy seco.</p>';
+ r.innerHTML=h;r.hidden=false}
+$("chips").onclick=function(e){var b=e.target.closest("button");if(!b)return;
+ [].forEach.call($("chips").children,function(x){x.setAttribute("aria-pressed",x==b)});cur=b.textContent;show();$("res").scrollIntoView({behavior:"smooth"})};
+["fs","nom","loc","est","tam","uni","sue"].forEach(function(i){$(i).addEventListener("input",show)});
+$("gu").onclick=function(){try{localStorage.setItem("terreno",JSON.stringify({n:$("nom").value,l:$("loc").value,e:$("est").value,t:$("tam").value,u:$("uni").value,s:$("sue").value}));$("gm").textContent="Terreno guardado en este dispositivo."}catch(x){$("gm").textContent="No se pudo guardar en este navegador."}};
+try{var t=JSON.parse(localStorage.getItem("terreno")||"null");if(t){$("nom").value=t.n;$("loc").value=t.l;$("est").value=t.e;$("tam").value=t.t;$("uni").value=t.u;$("sue").value=t.s}}catch(x){}
+var M=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+var T={"Maíz":[24,30],"Frijol":[15,27],"Avena":[15,20],"Trigo":[15,25],"Sorgo":[22,30],"Haba":[15,20],"Zanahoria":[15,20],"Lechuga":[15,20],"Papa":[15,20],"Calabaza":[20,30]};
+var ROT=[{n:"Solo maíz cada ciclo",c:["Maíz"]},{n:"Maíz–frijol",c:["Maíz","Frijol"]},{n:"Trigo–frijol",c:["Trigo","Frijol"]},{n:"Maíz–frijol–avena–papa",c:["Maíz","Frijol","Avena","Papa"]},{n:"Sorgo–frijol–avena",c:["Sorgo","Frijol","Avena"]}];
+$("ra").innerHTML=ROT.map(function(r,i){return'<option value="'+i+'">'+r.n+"</option>"}).join("");
+/* Mapa real (Leaflet) */
+var pts=[],demo=false,mk,cm=null,acc=null,wid=null;
+var map=L.map("map").setView([19.64,-101.92],11);
+var calles=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(map);
+var sat=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,attribution:"Esri"});
+L.control.layers({"Calles":calles,"Satélite":sat}).addTo(map);mk=L.layerGroup().addTo(map);
+function gl(){$("gl").href="https://www.google.com/maps?q="+$("la").value+","+$("lo").value}
+function setPos(la,lo,z){$("la").value=(+la).toFixed(5);$("lo").value=(+lo).toFixed(5);if(cm)cm.setLatLng([la,lo]);else cm=L.circleMarker([la,lo],{radius:9,color:"#a3321f",weight:3,fillOpacity:.3}).addTo(map);map.setView([la,lo],z||map.getZoom());gl()}
+function msg(t){$("bm").textContent=t}
+function renderPts(){mk.clearLayers();pts.forEach(function(p){L.circleMarker([p.la,p.lo],{radius:8,color:"#2f6b2f",fillColor:"#b4690e",fillOpacity:1}).bindTooltip(p.n,{permanent:true,direction:"right"}).addTo(mk)});
+ $("pl").innerHTML=pts.map(function(p,i){return"<li>"+esc(p.n)+" ("+p.la.toFixed(4)+", "+p.lo.toFixed(4)+') <button type="button" data-i="'+i+'" class="note" style="min-height:44px">Quitar</button></li>'}).join("")||'<li class="note">Aún no hay puntos guardados.</li>'}
+function sv(){try{localStorage.setItem("puntos",JSON.stringify(pts))}catch(x){}}
+map.on("click",function(e){setPos(e.latlng.lat,e.latlng.lng)});
+$("bb").onclick=function(){var q=$("bq").value.trim();if(!q)return;msg("Buscando…");
+ fetch("https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=mx&q="+encodeURIComponent(q)).then(function(r){return r.json()}).then(function(a){if(!a.length){msg("No encontré ese lugar. Prueba con pueblo y estado.");return}setPos(+a[0].lat,+a[0].lon,14);if(!$("pn").value)$("pn").value=q;msg("Encontrado: "+a[0].display_name)}).catch(function(){msg("No se pudo buscar. Revisa tu internet.")})};
+$("bq").onkeydown=function(e){if(e.key=="Enter")$("bb").click()};
+$("gc").onclick=function(){var a=+$("la").value,o=+$("lo").value;if(isNaN(a)||isNaN(o)||Math.abs(a)>90||Math.abs(o)>180){msg("Revisa las coordenadas.");return}setPos(a,o,15);msg("")};
+$("rt").onclick=function(){if(wid!==null){navigator.geolocation.clearWatch(wid);wid=null;$("rt").textContent=I18N("Usar mi ubicación en tiempo real");msg("");return}
+ if(!navigator.geolocation){msg("Tu navegador no permite ubicación.");return}msg("Buscando tu ubicación…");$("rt").textContent=I18N("Dejar de seguir mi ubicación");
+ wid=navigator.geolocation.watchPosition(function(p){setPos(p.coords.latitude,p.coords.longitude,16);if(acc)map.removeLayer(acc);acc=L.circle([p.coords.latitude,p.coords.longitude],{radius:p.coords.accuracy,weight:1}).addTo(map);msg("Ubicación en vivo. Precisión de unos "+Math.round(p.coords.accuracy)+" m.")},function(){navigator.geolocation.clearWatch(wid);wid=null;$("rt").textContent=I18N("Usar mi ubicación en tiempo real");msg("No se pudo obtener tu ubicación. Permite el acceso en tu navegador.")},{enableHighAccuracy:true})};
+$("ap").onclick=function(){var a=+$("la").value,o=+$("lo").value;if(isNaN(a)||isNaN(o))return;pts.push({n:$("pn").value||"Punto",la:a,lo:o});sv();renderPts()};
+$("pl").onclick=function(e){var b=e.target.closest("button");if(!b)return;pts.splice(+b.dataset.i,1);sv();renderPts()};
+try{pts=JSON.parse(localStorage.getItem("puntos")||"[]")}catch(x){pts=[]}
+renderPts();gl();
+/* Clima y rotaciones */
+function parse(){var L=$("cl").value.trim().split(/\n+/).map(function(l){return l.trim().split(/[,;\s]+/).map(Number)});
+ if(L.length!=12||L.some(function(r){return r.length<3||r.slice(0,3).some(isNaN)}))return null;return L}
+function fit(k,D){var c=C[k],r=T[k],w=c.m[0],b=null;
+ for(var s=0;s<12;s++){var n=0,f=0;for(var j=0;j<w;j++){var d=D[(s+j)%12],tm=(d[0]+d[1])/2;if(tm>=r[0]&&tm<=r[1])n++;if(d[0]<=0)f++}
+  var sc=n-2*f;if(!b||sc>b.sc)b={s:s,n:n,f:f,w:w,sc:sc}}
+ b.q=b.f?0:b.n/w;b.l=b.f?"✖ Riesgosa (helada)":b.q>=.8?"✔ Buena":b.q>=.5?"▲ Regular":"✖ Riesgosa";return b}
+function calc(){var D=parse(),o=$("cr"),h="";
+ if(!D){o.innerHTML='<div class="risk">Escribe 12 líneas (enero a diciembre) con Tmín, Tmáx y lluvia, separadas por comas. Ejemplo: 5.2, 22.1, 12</div>';return}
+ if(demo)h+='<div class="warn"><b>Datos de ejemplo inventados para probar la página.</b> No son de la NASA ni de tu terreno: no los uses para decidir.</div>';
+ function ms(f){return D.map(function(d,i){return f(d)?M[i]:null}).filter(Boolean).join(", ")||"ninguno"}
+ h+='<div class="card"><h3>Qué dicen tus datos del clima</h3><ul><li><b>Helada probable (Tmín de 0 °C o menos):</b> '+ms(function(d){return d[0]<=0})+"</li><li><b>Riesgo de helada (Tmín de 0 a 3 °C):</b> "+ms(function(d){return d[0]>0&&d[0]<=3})+"</li><li><b>Calor alto (Tmáx de 33 °C o más):</b> "+ms(function(d){return d[1]>=33})+"</li><li><b>Meses secos (menos de 30 mm):</b> "+ms(function(d){return d[2]<30})+"</li><li><b>Lluvias fuertes (100 mm o más; vigila encharcamiento y erosión):</b> "+ms(function(d){return d[2]>=100})+'</li></ul><p class="note">Los umbrales son de esta herramienta, no del documento base.</p></div>';
+ h+='<div class="card"><h3>Cuándo sembrar cada cultivo según tu clima</h3><div class="tw"><table><tr><th>Cultivo</th><th>Mejor mes de siembra</th><th>Meses en su rango de temperatura</th><th>Encaje</th></tr>'+Object.keys(C).map(function(k){var f=fit(k,D);return"<tr><td>"+k+"</td><td>"+M[f.s]+"</td><td>"+f.n+" de "+f.w+"</td><td>"+f.l+"</td></tr>"}).join("")+'</table></div><p class="note">Compara la temperatura media mensual con el rango ideal del documento base, durante el tiempo mínimo de cultivo.</p></div>';
+ var P=$("pr").value,cu=+$("ra").value;
+ var sc=ROT.map(function(R,i){var f=R.c.map(function(k){return fit(k,D)}),s=f.reduce(function(a,x){return a+x.q},0)/f.length*10,has=function(k){return R.c.indexOf(k)>-1};
+  if(P=="agua"&&has("Sorgo"))s+=3;if(P=="suelo"){if(has("Frijol")||has("Haba"))s+=2;if(has("Avena"))s+=1}if(P=="forraje"&&has("Avena"))s+=2;return{R:R,f:f,i:i,s:s}});
+ var pk=[sc[cu]].concat(sc.filter(function(x){return x.i!=cu}).sort(function(a,b){return b.s-a.s}).slice(0,2));
+ h+="<h3>Comparación de 3 rotaciones</h3>";
+ pk.forEach(function(x,j){var R=x.R,has=function(k){return R.c.indexOf(k)>-1},b=[],rk=[];
+  if(has("Frijol")||has("Haba"))b.push("Incluye leguminosa: el frijol puede incorporar nitrógeno al suelo.");
+  if(has("Avena"))b.push("La avena cubre el terreno y ayuda contra la erosión; sirve para grano o forraje.");
+  if(has("Sorgo"))b.push("El sorgo se adapta a la temporada seca.");
+  if(R.c.length>1)b.push("Alternar cultivos reduce la acumulación de plagas y enfermedades.");
+  if(has("Maíz")&&has("Frijol"))b.push("Maíz–frijol conserva la fertilidad, según el documento.");
+  R.c.forEach(function(k,i){if(x.f[i].q<.5)rk.push("<b>"+k+":</b> su mejor ventana (siembra en "+M[x.f[i].s]+") queda fuera de su rango de temperatura o con helada. Revisa fechas con un técnico.")});
+  if(R.c.length==1)rk.push("Repetir el mismo cultivo no cambia los nutrientes ni los ciclos de plagas; el documento recomienda rotar.");
+  h+='<div class="card"><h3>'+(j?"Sugerida "+j:"Tu rotación actual")+": "+R.n+'</h3><p><b>Por qué:</b> '+(j?"encaja con tu clima y con tu prioridad.":"es tu punto de comparación.")+" Puntaje de encaje: "+x.s.toFixed(1)+'.</p><p><b>Cultivos:</b> '+R.c.map(function(k,i){return k+" (siembra en "+M[x.f[i].s]+", "+x.f[i].l+")"}).join("; ")+"</p><p><b>Beneficios posibles:</b></p><ul>"+b.map(function(t){return"<li>"+t+"</li>"}).join("")+"</ul>"+(rk.length?'<div class="risk">'+rk.join("<br>")+"</div>":"")+"</div>"});
+ h+='<div class="card"><h3>Lo que falta y lo que debe revisar un experto</h3><ul><li><b>Evidencia usada:</b> temperaturas ideales y manejo del documento base, más tu clima mensual.</li><li><b>No está en el documento:</b> precios, mercado local, ingreso, consumo exacto de agua y análisis de tu suelo. Por eso «ingreso extra» no suma puntos.</li><li><b>No conectado aún:</b> humedad del suelo (SMAP), estrés térmico (ECOSTRESS), lluvia (GPM), vegetación (Landsat/MODIS), elevación (SRTM).</li><li><b>Incertidumbre:</b> 12 promedios mensuales no muestran años extremos ni heladas aisladas. El microclima de tu parcela puede ser distinto.</li><li><b>Decide tú:</b> esta herramienta no reemplaza tu experiencia ni la de la oficina local de sanidad vegetal.</li></ul></div>';
+ o.innerHTML=h}
+$("ca").onclick=function(){demo=false;calc()};
+$("ej").onclick=function(){$("cl").value="4,22,12\n5,24,8\n7,27,10\n9,29,20\n11,30,45\n13,28,150\n12,25,180\n12,25,170\n12,25,150\n9,25,70\n6,23,15\n4,21,10";demo=true;calc()};
+
+/* Idiomas y menú. Para el purépecha, agrega pares "texto en español":"traducción" en PU. */
+var PU={};
+var EN={"Rotación de cultivos en México":"Crop rotation in Mexico","Bienvenido. Primero elige tu idioma y luego lo que quieres hacer.":"Welcome. First choose your language, then what you want to do.","Idioma":"Language","¿Qué quieres hacer?":"What do you want to do?","Mi terreno":"My land","Elegir cultivo":"Choose a crop","Mapa":"Map","Clima y rotaciones":"Climate and rotations","Riesgos y consejos":"Risks and tips","Inicio":"Home",
+"Elige tu terreno y tu cultivo. Verás cuándo preparar, sembrar y cosechar, y qué riesgos vigilar.":"Choose your land and your crop. You will see when to prepare, sow and harvest, and which risks to watch.",
+"1. Tu terreno":"1. Your land","Nombre del terreno":"Land name","Pueblo o ciudad":"Town or city","Estado":"State","Tamaño del terreno":"Land size","Unidad":"Unit","hectáreas":"hectares","metros cuadrados":"square meters","Tipo de suelo":"Soil type","No sé":"I don’t know","Arcilloso":"Clay","Arenoso":"Sandy","Franco / medio":"Loam / medium","Guardar terreno":"Save land",
+"2. ¿Qué cultivo vas a sembrar?":"2. Which crop will you plant?","Fecha en que piensas sembrar":"Planned sowing date",
+"3. Ubicación en el mapa":"3. Location on the map","Buscar dirección o lugar":"Search an address or place","Buscar":"Search","Usar mi ubicación en tiempo real":"Use my live location","Dejar de seguir mi ubicación":"Stop following my location","Ir a las coordenadas":"Go to coordinates","También puedes tocar el mapa para marcar un punto.":"You can also tap the map to mark a point.","Nombre del punto":"Point name","Latitud":"Latitude","Longitud":"Longitude","Agregar punto":"Add point","Abrir en Google Maps":"Open in Google Maps",
+"4. Clima de tu punto y comparación de rotaciones":"4. Climate at your point and rotation comparison","Clima mensual":"Monthly climate","¿Qué te importa más?":"What matters most to you?","Ahorrar agua":"Save water","Mejorar el suelo":"Improve the soil","Forraje para animales":"Animal feed","Ingreso extra":"Extra income","Tu rotación actual":"Your current rotation","Comparar rotaciones":"Compare rotations","Probar con datos de ejemplo":"Try with sample data",
+"Para todos los cultivos":"For all crops","Cuándo es peligroso sembrar":"When sowing is risky","Cuándo es peligroso cosechar":"When harvesting is risky","Riesgos del clima":"Weather risks","Lista para que no mueran las plantas":"Checklist to keep plants alive","Rotación y regiones":"Rotation and regions","Qué significan estos términos":"What these terms mean","Capa satelital de la NASA":"NASA satellite layer","Fecha de la imagen":"Image date","Transparencia de la capa":"Layer opacity","Ninguna":"None","Color real (MODIS)":"True color (MODIS)","Vegetación sana (NDVI)":"Healthy vegetation (NDVI)","Temperatura de la superficie (día)":"Surface temperature (day)","Lluvia reciente (IMERG)":"Recent rainfall (IMERG)"};
+var DIC={en:EN,pu:PU},TN=[],lang="es";
+(function(){var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT),n;while(n=w.nextNode()){var p=n.parentNode;if(p.closest("script,style,textarea,#res,#cr,#pl,#bm,#gm,.lg"))continue;var m=/^(\s*)([\s\S]*?)(\s*)$/.exec(n.nodeValue);if(m[2])TN.push({n:n,pre:m[1],o:m[2],post:m[3]})}})();
+function I18N(t){return(DIC[lang]&&DIC[lang][t])||t}
+function setLang(l){lang=l;TN.forEach(function(x){x.n.nodeValue=x.pre+I18N(x.o)+x.post});document.documentElement.lang=l=="pu"?"es":l;
+ [].forEach.call(document.querySelectorAll(".lg button"),function(b){b.setAttribute("aria-pressed",b.dataset.l==l)});$("pun").hidden=l!="pu";try{localStorage.setItem("idioma",l)}catch(x){}}
+function go(p){if(p=="home"){$("wel").hidden=false;return}$("wel").hidden=true;$("nv").hidden=false;
+ [].forEach.call(document.querySelectorAll(".pg"),function(x){x.classList.toggle("on",x.id==p)});
+ [].forEach.call($("nv").querySelectorAll("button[data-p]"),function(b){b.setAttribute("aria-current",b.dataset.p==p)});
+ if(p=="p3")setTimeout(function(){map.invalidateSize()},60);window.scrollTo(0,0)}
+document.addEventListener("click",function(e){var b=e.target.closest("button[data-l],button[data-p]");if(!b)return;if(b.dataset.l)setLang(b.dataset.l);else go(b.dataset.p)});
+try{var gl2=localStorage.getItem("idioma");if(gl2&&gl2!="es")setLang(gl2)}catch(x){}
+
+/* Capas satelitales NASA GIBS */
+var NL={t:["MODIS_Terra_CorrectedReflectance_TrueColor","jpg",9,"Imagen real tomada por el satélite Terra (MODIS). Sirve para ver tu zona desde arriba."],n:["MODIS_Terra_NDVI_8Day","png",9,"NDVI: más verde indica vegetación más sana. Es un promedio de 8 días; si no ves nada, prueba otra fecha."],l:["MODIS_Terra_Land_Surface_Temp_Day","png",7,"Temperatura de la superficie del suelo de día (MODIS). Colores cálidos indican más calor."],p:["IMERG_Precipitation_Rate","png",6,"Intensidad de lluvia estimada por satélite (IMERG, GPM). Es una escala gruesa, no mide tu parcela exacta."]},nlay=null;
+(function(){var d=new Date();d.setDate(d.getDate()-3);$("nd").value=d.toISOString().slice(0,10)})();
+function nasa(){if(nlay){map.removeLayer(nlay);nlay=null}var k=$("nl").value;if(!k){$("nn").textContent="";return}var c=NL[k];
+ nlay=L.tileLayer("https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/"+c[0]+"/default/"+$("nd").value+"/GoogleMapsCompatible_Level"+c[2]+"/{z}/{y}/{x}."+c[1],{maxNativeZoom:c[2],maxZoom:19,opacity:$("no").value/100,attribution:"NASA GIBS"}).addTo(map);
+ $("nn").textContent=c[3]+" Las imágenes de la NASA tardan 1 a 3 días en publicarse; si sale vacío, elige una fecha anterior."}
+["nl","nd","no"].forEach(function(i){$(i).addEventListener("input",nasa)});
+</script></body></html>
